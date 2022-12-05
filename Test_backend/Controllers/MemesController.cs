@@ -87,5 +87,29 @@ namespace Test_backend.Controllers
 
         }
 
+
+
+        //Implementation a paginator
+        [HttpGet("search")]
+        public async Task<SearchByNamePaginationResponse> SearchByNameAsync([FromQuery] SearchByNameDescriptionFilter filter)
+        {
+            var memesListed = new List<Meme>();
+            var memesFiltered = await _memesService.PaginationFilteredByNameDescription(filter);
+
+            for (var i = 0; i <= filter.ElementsInPageCount - 1; i++)
+            {
+                var element = memesFiltered.ElementAtOrDefault(filter.ElementsInPageCount * (filter.Page - 1) + i);
+                if (element != null) memesListed.Add(element);
+            }
+
+
+            var total = (double)memesFiltered.Count / filter.ElementsInPageCount;
+            var totalPages = (int)Math.Ceiling(total);
+
+            return new SearchByNamePaginationResponse(filter.Page, totalPages, filter.ElementsInPageCount, memesListed);
+
+        }
+
+
     }
 }

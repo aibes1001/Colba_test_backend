@@ -9,6 +9,8 @@ builder.Services.Configure<MemeStoreDatabaseSettings>(
 
 builder.Services.AddSingleton<MemesService>();
 
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
