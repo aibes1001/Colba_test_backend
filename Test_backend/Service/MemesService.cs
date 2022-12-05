@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Test_backend.Models;
@@ -49,6 +50,9 @@ namespace Test_backend.Services
         public async Task RemoveAsync(string id) =>
             await _memesCollection.DeleteOneAsync(x => x.Id == id);
 
+        public async Task<List<Meme>> PaginationFilteredByNameDescription([FromQuery] SearchByNameDescriptionFilter filter) =>
+            await _memesCollection.Find( m => m.Name.ToLower().Contains(filter.Name.ToLower())
+            || m.Description.ToLower().Contains(filter.Description.ToLower())).ToListAsync();
 
     }
 }
