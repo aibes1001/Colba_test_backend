@@ -29,7 +29,7 @@ namespace Test_backend.Controllers
         }
 
         //Search an id with 24 caracters!!
-        [HttpGet("id/{id:length(24)}")]
+        [HttpGet("Meme/{id:length(24)}")]
         public async Task<ActionResult<Meme>> GetById(string id)
         {
             try
@@ -137,8 +137,7 @@ namespace Test_backend.Controllers
         }
 
 
-
-        //Implementation a paginator
+        //Implementation of a meme pagination
         [HttpGet("search")]
         public async Task<ActionResult<SearchByNamePaginationResponse>> SearchByNameAsync([FromQuery] SearchByNameDescriptionFilter filter)
         {
