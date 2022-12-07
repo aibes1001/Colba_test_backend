@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Test_backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class MemesController : ControllerBase
     {
         private readonly MemesService _memesService;
@@ -29,8 +29,8 @@ namespace Test_backend.Controllers
         }
 
         //Search an id with 24 caracters!!
-        [HttpGet("Meme/{id:length(24)}")]
-        public async Task<ActionResult<Meme>> GetById(string id)
+        [HttpGet("meme/{id:length(24)}")]
+        public async Task<ActionResult<Uri>> GetById(string id)
         {
             try
             {
@@ -41,7 +41,11 @@ namespace Test_backend.Controllers
                     return NotFound();
                 }
 
-                return meme;
+                meme.Count += 1;
+
+                await _memesService.UpdateAsync(meme.Id, meme);
+
+                return meme.Original;
             }
             catch(Exception)
             {

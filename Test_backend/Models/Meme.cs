@@ -17,9 +17,11 @@ namespace Test_backend.Models
 
         public int Height { get; set; }
 
-        public string Original { get; set; }
+        public Uri Original { get; set; }
 
-        public string Thumbnail { get; set; }
+        public Uri Thumbnail { get; set; }
+
+        public int Count { get; set; } = 0;
 
     }
 }
