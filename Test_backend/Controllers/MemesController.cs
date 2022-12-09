@@ -9,24 +9,33 @@ namespace Test_backend.Controllers
     public class MemesController : ControllerBase
     {
         private readonly MemesService _memesService;
-        public MemesController(MemesService booksService)
+        private JwtService _jwtService;
+
+        public MemesController(MemesService booksService, JwtService jwtService)
         {
             _memesService = booksService;
+            _jwtService = jwtService;
         }
+
 
         [HttpGet]
         public async Task<ActionResult<List<Meme>>> GetAll()
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
                 return await _memesService.GetAsync();
             }
             catch (Exception)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-            
         }
+
 
         //Search an id with 24 caracters!!
         [HttpGet("meme/{id:length(24)}")]
@@ -34,6 +43,11 @@ namespace Test_backend.Controllers
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
                 var meme = await _memesService.GetIdAsync(id);
 
                 if (meme is null)
@@ -47,11 +61,11 @@ namespace Test_backend.Controllers
 
                 return meme.Original;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-            
+
         }
 
 
@@ -60,6 +74,11 @@ namespace Test_backend.Controllers
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
                 var meme = await _memesService.GetNameAsync(name);
 
                 if (meme is null)
@@ -73,14 +92,23 @@ namespace Test_backend.Controllers
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-            
+
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Post(Meme newMeme)
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
+                if (token.result.UserRole != "premium") return StatusCode(StatusCodes.Status403Forbidden,
+                    "The user has not permission to create a meme.");
+
                 await _memesService.CreateAsync(newMeme);
 
                 return CreatedAtAction(nameof(GetById), new { id = newMeme.Id }, newMeme);
@@ -89,14 +117,22 @@ namespace Test_backend.Controllers
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-            
         }
+
 
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, Meme updatedMeme)
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
+                if (token.result.UserRole != "premium") return StatusCode(StatusCodes.Status403Forbidden,
+                    "The user has not permission to modify a meme.");
+
                 var meme = await _memesService.GetIdAsync(id);
 
                 if (meme is null)
@@ -108,20 +144,28 @@ namespace Test_backend.Controllers
 
                 await _memesService.UpdateAsync(id, updatedMeme);
 
-                return NoContent();
+                return Ok("Meme has been updated");
             }
             catch (Exception)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-            
         }
+
 
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
+                if (token.result.UserRole != "premium") return StatusCode(StatusCodes.Status403Forbidden,
+                    "The user has not permission to delete a meme.");
+
                 var meme = await _memesService.GetIdAsync(id);
 
                 if (meme is null)
@@ -131,7 +175,7 @@ namespace Test_backend.Controllers
 
                 await _memesService.RemoveAsync(id);
 
-                return NoContent();
+                return Ok("Meme has been deleted");
             }
             catch (Exception)
             {
@@ -147,6 +191,11 @@ namespace Test_backend.Controllers
         {
             try
             {
+                var token = _jwtService.TokenValidation(this.HttpContext);
+
+                if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
+                        token.msg);
+
                 var memesListed = new List<Meme>();
                 var memesFiltered = await _memesService.PaginationFilteredByNameDescription(filter);
 
@@ -162,11 +211,11 @@ namespace Test_backend.Controllers
 
                 return new SearchByNamePaginationResponse(filter.Page, totalPages, filter.ElementsInPageCount, memesListed);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-            
+
         }
 
 
