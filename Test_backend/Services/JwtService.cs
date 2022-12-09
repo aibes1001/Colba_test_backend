@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,6 +16,7 @@ namespace Test_backend.Services
     {
         private IConfiguration _configuration;
         private Jwt jwt;
+
         public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -55,5 +59,6 @@ namespace Test_backend.Services
             return Jwt.ValidateToken(identity);
 
         }
+
     }
 }

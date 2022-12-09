@@ -34,7 +34,6 @@ namespace Test_backend.Controllers
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
-
         }
 
 
@@ -103,12 +102,6 @@ namespace Test_backend.Controllers
             try
             {
                 var token = _jwtService.TokenValidation(this.HttpContext);
-                //Example of structure of a token:
-                //{
-                //  success = true,
-                //  msg = "Validation token successfull",
-                //  result = { UserId = "638fb99f6f74cba55f0a7274", Username = "user1", UserRole = "free" }
-                //}
 
                 if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
                         token.msg);
