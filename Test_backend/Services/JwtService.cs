@@ -53,11 +53,97 @@ namespace Test_backend.Services
             };
         }
 
+
+
+        public dynamic IsAuthenticated(HttpContext context, ControllerBase cb)
+        {
+            var token = TokenValidation(context);
+
+            if (!token.success) 
+            {
+                return new
+                {
+                    success = false,
+                    status = cb.StatusCode(StatusCodes.Status401Unauthorized,
+                    token.msg)
+                };
+            }
+
+            return new
+            {
+                success = true,
+                role = token.result.UserRole
+            };
+        }
+
+
+
+        public dynamic IsAuthenticatedPremium(HttpContext context, ControllerBase cb)
+        {
+            var isAuthenticated = IsAuthenticated(context, cb);
+
+            if (!isAuthenticated.success) return isAuthenticated;
+
+            if (isAuthenticated.role != "premium") 
+            {
+                return new
+                {
+                    success = false,
+                    status = cb.StatusCode(StatusCodes.Status403Forbidden,
+                    "The user has not permission to create a meme.")
+                };
+            }
+
+            return isAuthenticated;
+        }
+
+
+
+
+
         public dynamic TokenValidation(HttpContext context)
         {
             var identity = context.User.Identity as ClaimsIdentity;
-            return Jwt.ValidateToken(identity);
+            return _ValidateToken(identity);
 
+        }
+
+
+        private static dynamic _ValidateToken(ClaimsIdentity identity)
+        {
+            try
+            {
+                if (identity.Claims.Count() == 0)
+                {
+                    return new
+                    {
+                        success = false,
+                        msg = "Not valid token",
+                        result = ""
+                    };
+                }
+                return new
+                {
+                    success = true,
+                    msg = "Validation token successfull",
+                    result = new
+                    {
+                        UserId = identity.Claims.FirstOrDefault(x => x.Type == "Id").Value,
+                        Username = identity.Claims.FirstOrDefault(x => x.Type == "Username").Value,
+                        UserRole = identity.Claims.FirstOrDefault(x => x.Type == "Role").Value
+                    }
+                };
+            }
+            catch (Exception e)
+            {
+                return new
+                {
+                    success = false,
+                    msg = "Error validation" + e.ToString(),
+                    result = ""
+
+                };
+            }
         }
 
     }

@@ -23,10 +23,17 @@ namespace Test_backend.Controllers
         {
             try
             {
-                var token = _jwtService.TokenValidation(this.HttpContext);
+                /*var token = _jwtService.TokenValidation(this.HttpContext);
 
                 if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
-                        token.msg);
+                        token.msg);*/
+
+                var tokenValidation = _jwtService.IsAuthenticated(this.HttpContext, this);
+                if (!tokenValidation.success)
+                {
+                    return tokenValidation.status;
+                }
+
 
                 return await _memesService.GetAsync();
             }
@@ -101,13 +108,19 @@ namespace Test_backend.Controllers
         {
             try
             {
-                var token = _jwtService.TokenValidation(this.HttpContext);
+                /*var token = _jwtService.TokenValidation(this.HttpContext);
 
                 if (!token.success) return StatusCode(StatusCodes.Status401Unauthorized,
                         token.msg);
 
                 if (token.result.UserRole != "premium") return StatusCode(StatusCodes.Status403Forbidden,
-                    "The user has not permission to create a meme.");
+                    "The user has not permission to create a meme.");*/
+
+                var tokenValidation = _jwtService.IsAuthenticatedPremium(this.HttpContext, this);
+                if (!tokenValidation.success)
+                {
+                    return tokenValidation.status;
+                }
 
                 await _memesService.CreateAsync(newMeme);
 
