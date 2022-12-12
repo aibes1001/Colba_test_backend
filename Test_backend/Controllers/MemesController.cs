@@ -46,7 +46,7 @@ namespace Test_backend.Controllers
 
         //Search an id with 24 caracters!!
         [HttpGet("meme/{id:length(24)}")]
-        public async Task<ActionResult<Uri>> GetById(string id)
+        public async Task<ActionResult<Meme>> GetById(string id)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace Test_backend.Controllers
 
                 await _memesService.UpdateAsync(meme.Id, meme);
 
-                return meme.Original;
+                return meme;
             }
             catch (Exception)
             {
