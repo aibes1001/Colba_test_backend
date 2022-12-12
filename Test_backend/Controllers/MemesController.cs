@@ -11,9 +11,9 @@ namespace Test_backend.Controllers
         private readonly MemesService _memesService;
         private JwtService _jwtService;
 
-        public MemesController(MemesService booksService, JwtService jwtService)
+        public MemesController(MemesService memesService, JwtService jwtService)
         {
-            _memesService = booksService;
+            _memesService = memesService;
             _jwtService = jwtService;
         }
 
